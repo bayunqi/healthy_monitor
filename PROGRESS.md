@@ -4,8 +4,8 @@
 
 ## Current Phase: Phase 1 MVP — "Does it actually remind me?"
 
-**Last Updated:** 2026-05-11  
-**Next Milestone:** HealthyMonitorCore Swift Package — ReminderEngine + ActivityLogger + unit tests  
+**Last Updated:** 2026-05-21  
+**Next Milestone:** First build + run in Xcode → 7-day self-use period  
 **Target Milestone Date:** 2026-05-25 (Week 2)
 
 ---
@@ -45,18 +45,20 @@
   - `MacNotificationDelegate` (action button handling)
   - `KeychainHelper` (API key storage)
 - [2026-05-11] **XcodeGen project** generated at `HealthyMonitorMac.xcodeproj`
+- [2026-05-21] **v1 tagged** — pushed to `origin/main` and `origin/v1`. Xcode 26.3 confirmed installed locally. README rewritten in Apple product-introduction style. `.gitignore` added.
 
 ---
 
 ## In Progress
 
-*(none — install Xcode to build and run the macOS app)*
+- First build + run in Xcode on the development Mac
+- Setup on second Mac: clone → Xcode build → re-enter DeepSeek API key in Settings (Keychain is local, not iCloud-synced)
 
 ---
 
 ## Blocked
 
-- **Xcode not installed** — macOS app cannot be built or run without Xcode. All source files are written and the `.xcodeproj` is generated. Install Xcode from the App Store, then `open HealthyMonitorMac.xcodeproj` to build and run.
+*(none)*
 
 ## Architecture Note
 

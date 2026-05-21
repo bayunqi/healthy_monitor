@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthyMonitor — 使用指南</title>
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --card: #ffffff;
+      --border: #e0e0e5;
+      --accent: #007aff;
+      --green: #34c759;
+      --orange: #ff9500;
+      --red: #ff3b30;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --radius: 14px;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.6; }
+
+    /* Layout */
+    header { background: var(--card); border-bottom: 1px solid var(--border); padding: 24px 48px; }
+    .header-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+    .app-icon { width: 52px; height: 52px; background: linear-gradient(145deg, #ff6b6b, #ee5a24); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+    .app-name { font-size: 22px; font-weight: 700; }
+    .app-tagline { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    main { max-width: 860px; margin: 0 auto; padding: 40px 48px; }
+
+    /* Sections */
+    .section { margin-bottom: 48px; }
+    h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .section-desc { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+
+    /* Cards */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .card-icon { font-size: 20px; }
+    .card-title { font-size: 15px; font-weight: 600; }
+    .card-subtitle { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .card-body { padding: 20px; }
+
+    /* Step list */
+    .steps { list-style: none; }
+    .step { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .step:last-child { border-bottom: none; }
+    .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: white; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .step-content { flex: 1; }
+    .step-title { font-weight: 600; margin-bottom: 3px; }
+    .step-desc { font-size: 13px; color: var(--muted); }
+
+    /* UI mockup */
+    .mockup-wrap { display: flex; justify-content: center; margin: 20px 0; }
+    .mockup { background: #1c1c1e; border-radius: 14px; padding: 20px; width: 280px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+    .mockup-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .mockup-title { color: white; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .mockup-badge { background: rgba(52,199,89,.2); color: #34c759; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+    .mockup-divider { height: 1px; background: #3a3a3c; margin: 10px 0; }
+    .mockup-label { color: #8e8e93; font-size: 11px; margin-bottom: 10px; }
+    .rings { display: flex; justify-content: space-around; }
+    .ring-item { text-align: center; }
+    .ring-wrap { position: relative; width: 52px; height: 52px; margin: 0 auto 6px; }
+    .ring-bg { fill: none; stroke: #3a3a3c; stroke-width: 4; }
+    .ring-fg { fill: none; stroke-width: 4; stroke-linecap: round; transform-origin: center; transform: rotate(-90deg); }
+    .ring-green { stroke: #34c759; }
+    .ring-orange { stroke: #ff9500; }
+    .ring-blue { stroke: #007aff; }
+    .ring-emoji { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; }
+    .ring-label { color: #8e8e93; font-size: 10px; }
+    .ring-count { color: white; font-size: 10px; font-weight: 700; margin-top: 2px; }
+    .mockup-action { display: flex; align-items: center; gap: 8px; padding: 8px 0; color: #8e8e93; font-size: 13px; }
+    .mockup-action-icon { width: 20px; text-align: center; }
+    .mockup-footer { display: flex; justify-content: space-between; color: #8e8e93; font-size: 11px; padding-top: 4px; }
+
+    /* Notification mockup */
+    .notif-wrap { display: flex; justify-content: center; margin: 20px 0; }
+    .notif { background: white; border-radius: 14px; padding: 14px 16px; width: 340px; box-shadow: 0 8px 30px rgba(0,0,0,.15); }
+    .notif-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .notif-app-icon { width: 28px; height: 28px; background: linear-gradient(145deg, #ff6b6b, #ee5a24); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .notif-app-name { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    .notif-time { font-size: 12px; color: var(--muted); margin-left: auto; }
+    .notif-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .notif-body { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .notif-actions { display: flex; gap: 8px; }
+    .notif-btn { flex: 1; padding: 8px; border-radius: 8px; font-size: 13px; font-weight: 500; text-align: center; border: none; cursor: default; }
+    .notif-btn-done { background: #34c759; color: white; }
+    .notif-btn-skip { background: #e5e5ea; color: #1d1d1f; }
+    .notif-btn-snooze { background: #e5e5ea; color: #1d1d1f; }
+
+    /* Badge row */
+    .badge-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; }
+    .badge-green { background: rgba(52,199,89,.12); color: #1a7a34; }
+    .badge-orange { background: rgba(255,149,0,.12); color: #8a5200; }
+    .badge-red { background: rgba(255,59,48,.12); color: #8a1500; }
+    .badge-blue { background: rgba(0,122,255,.1); color: #0056cc; }
+
+    /* Settings mockup */
+    .settings-mockup { background: #f2f2f7; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+    .settings-row { display: flex; align-items: center; padding: 13px 16px; background: white; border-bottom: 1px solid var(--border); gap: 10px; }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-label { flex: 1; font-size: 14px; }
+    .settings-value { color: var(--muted); font-size: 13px; }
+    .settings-section-header { padding: 8px 16px; font-size: 12px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .05em; }
+
+    /* FAQ */
+    .faq-item { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 8px; background: var(--card); }
+    .faq-q { padding: 14px 16px; font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; }
+    .faq-a { padding: 0 16px 14px; font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 12px; background: #f5f5f7; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 1px solid var(--border); }
+    td { padding: 11px 12px; border-bottom: 1px solid var(--border); color: var(--muted); }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { color: var(--text); font-weight: 500; }
+
+    /* Callout */
+    .callout { border-left: 3px solid var(--accent); background: rgba(0,122,255,.07); border-radius: 0 10px 10px 0; padding: 12px 16px; font-size: 13px; color: var(--text); margin: 16px 0; }
+    .callout strong { color: var(--accent); }
+    .callout.tip { border-color: var(--green); background: rgba(52,199,89,.07); }
+    .callout.tip strong { color: #1a7a34; }
+
+    @media (max-width: 640px) {
+      main { padding: 24px 20px; }
+      header { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="app-icon">🫀</div>
+    <div>
+      <div class="app-name">HealthyMonitor</div>
+      <div class="app-tagline">你的私人健康助手 — 使用指南 v0.1</div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ① 它是什么 -->
+  <div class="section">
+    <h2>① 这个应用是做什么的？</h2>
+    <p class="section-desc">一句话：定时提醒你离开椅子、喝水、拉伸，并记录你今天的完成情况。</p>
+    <div class="card">
+      <div class="card-body">
+        <div class="badge-row">
+          <span class="badge badge-blue">🧍 站起来活动</span>
+          <span class="badge badge-blue">💧 喝水</span>
+          <span class="badge badge-blue">🤸 拉伸</span>
+          <span class="badge badge-green">✓ 记录每次完成</span>
+          <span class="badge badge-orange">📊 每日合规率统计</span>
+        </div>
+        <p style="font-size:13px; color:var(--muted)">
+          应用以<strong>菜单栏图标</strong>形式常驻 Mac 顶部状态栏（不占 Dock 位置）。每隔一段时间，
+          它会弹出系统通知提醒你，你只需点一下 <strong>"Done ✓"</strong>，就完成了一次记录。
+          积累的数据展示在菜单栏弹窗里，让你一眼看出今天的健康执行情况。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② 菜单栏弹窗 -->
+  <div class="section">
+    <h2>② 菜单栏弹窗长什么样？</h2>
+    <p class="section-desc">点击顶部菜单栏的 ♥ 图标，弹出以下界面：</p>
+
+    <div class="mockup-wrap">
+      <div class="mockup">
+        <div class="mockup-header">
+          <div class="mockup-title">♥ HealthyMonitor</div>
+          <div class="mockup-badge">72%</div>
+        </div>
+        <div class="mockup-label">今日完成情况</div>
+        <div class="rings">
+          <!-- Stand -->
+          <div class="ring-item">
+            <div class="ring-wrap">
+              <svg width="52" height="52" viewBox="0 0 52 52">
+                <circle class="ring-bg" cx="26" cy="26" r="22"/>
+                <circle class="ring-fg ring-green" cx="26" cy="26" r="22" stroke-dasharray="138 138" stroke-dashoffset="28"/>
+              </svg>
+              <div class="ring-emoji">🧍</div>
+            </div>
+            <div class="ring-label">站立</div>
+            <div class="ring-count">4/5</div>
+          </div>
+          <!-- Water -->
+          <div class="ring-item">
+            <div class="ring-wrap">
+              <svg width="52" height="52" viewBox="0 0 52 52">
+                <circle class="ring-bg" cx="26" cy="26" r="22"/>
+                <circle class="ring-fg ring-orange" cx="26" cy="26" r="22" stroke-dasharray="138 138" stroke-dashoffset="69"/>
+              </svg>
+              <div class="ring-emoji">💧</div>
+            </div>
+            <div class="ring-label">喝水</div>
+            <div class="ring-count">2/4</div>
+          </div>
+          <!-- Stretch -->
+          <div class="ring-item">
+            <div class="ring-wrap">
+              <svg width="52" height="52" viewBox="0 0 52 52">
+                <circle class="ring-bg" cx="26" cy="26" r="22"/>
+                <circle class="ring-fg ring-blue" cx="26" cy="26" r="22" stroke-dasharray="138 138" stroke-dashoffset="14"/>
+              </svg>
+              <div class="ring-emoji">🤸</div>
+            </div>
+            <div class="ring-label">拉伸</div>
+            <div class="ring-count">3/3</div>
+          </div>
+        </div>
+        <div class="mockup-divider"></div>
+        <div class="mockup-action"><div class="mockup-action-icon">⏸</div>暂停提醒</div>
+        <div class="mockup-action"><div class="mockup-action-icon">▶</div>恢复提醒</div>
+        <div class="mockup-divider"></div>
+        <div class="mockup-footer"><span>Settings</span><span>Quit</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <table>
+          <thead><tr><th>元素</th><th>含义</th></tr></thead>
+          <tbody>
+            <tr><td>♥ 图标（顶部状态栏）</td><td>应用运行标志。绿色=今天执行良好（>70%），橙色=一般，红色=需要加油</td></tr>
+            <tr><td>72% 绿色徽章</td><td>今天所有提醒类型的总合规率（已完成 ÷ 应完成）</td></tr>
+            <tr><td>圆环（🧍 💧 🤸）</td><td>每种类型的进度环，填满=100%完成，颜色同合规率逻辑</td></tr>
+            <tr><td>4/5 数字</td><td>已点 Done 的次数 / 今日计划触发次数</td></tr>
+            <tr><td>暂停提醒</td><td>临时关闭所有提醒（开会、专注工作时用）</td></tr>
+            <tr><td>恢复提醒</td><td>暂停后重新开启</td></tr>
+            <tr><td>Settings</td><td>打开设置窗口（调整间隔、工作时间、AI Key）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 提醒通知 -->
+  <div class="section">
+    <h2>③ 收到提醒通知时怎么做？</h2>
+    <p class="section-desc">每隔一段时间（默认站立45分钟、喝水90分钟、拉伸60分钟），你会收到这样的系统通知：</p>
+
+    <div class="notif-wrap">
+      <div class="notif">
+        <div class="notif-header">
+          <div class="notif-app-icon">🫀</div>
+          <div class="notif-app-name">HealthyMonitor</div>
+          <div class="notif-time">刚刚</div>
+        </div>
+        <div class="notif-title">🧍 Stand Up</div>
+        <div class="notif-body">You've been sitting a while. Stand up and move for a minute.</div>
+        <div class="notif-actions">
+          <div class="notif-btn notif-btn-done">Done ✓</div>
+          <div class="notif-btn notif-btn-skip">Skip</div>
+          <div class="notif-btn notif-btn-snooze">Snooze 10min</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <table>
+          <thead><tr><th>按钮</th><th>作用</th><th>对合规率的影响</th></tr></thead>
+          <tbody>
+            <tr><td>✅ Done ✓</td><td>确认已完成（站起来了/喝水了/拉伸了）</td><td>计入"已完成"，合规率 ↑</td></tr>
+            <tr><td>⏭ Skip</td><td>这次跳过（在开会/不方便）</td><td>计入"已跳过"，合规率略降</td></tr>
+            <tr><td>⏰ Snooze</td><td>10分钟后再提醒我</td><td>计入"已推迟"，暂不影响</td></tr>
+            <tr><td>（忽略/关闭）</td><td>没有点任何按钮</td><td>5分钟后自动标记为"已错过"，合规率 ↓</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <strong>💡 建议：</strong>收到通知 → 站起来做一件小事（倒杯水、走到窗边看一眼远处）→ 回来点 Done ✓。整个流程不超过 2 分钟，但对背部和眼睛的帮助是实实在在的。
+    </div>
+  </div>
+
+  <!-- ④ 提醒逻辑 -->
+  <div class="section">
+    <h2>④ 提醒什么时候触发？</h2>
+    <p class="section-desc">应用只在你的工作时间内、非安静时段发送提醒。</p>
+    <div class="card">
+      <div class="card-body">
+        <table>
+          <thead><tr><th>条件</th><th>行为</th></tr></thead>
+          <tbody>
+            <tr><td>在工作时间内（默认 9:00–18:00）</td><td>按间隔正常触发</td></tr>
+            <tr><td>在安静时段（可选，如 22:00–7:00）</td><td>不发任何提醒</td></tr>
+            <tr><td>工作时间外</td><td>不发提醒</td></tr>
+            <tr><td>点击"暂停提醒"</td><td>所有提醒暂停，直到手动恢复</td></tr>
+            <tr><td>app 启动后第一分钟</td><td>心跳引擎首次 tick，符合条件立即触发</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>注意：</strong>提醒基于本地通知，不需要网络连接。应用必须在运行（菜单栏可见）才能发送提醒。
+    </div>
+  </div>
+
+  <!-- ⑤ Settings -->
+  <div class="section">
+    <h2>⑤ Settings 设置什么？</h2>
+    <p class="section-desc">点击弹窗底部的 "Settings" 打开设置窗口，共三个 Tab：</p>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-header">
+        <div class="card-icon">🔔</div>
+        <div>
+          <div class="card-title">Reminders — 提醒间隔</div>
+          <div class="card-subtitle">调整每种提醒的触发频率（15–120 分钟）</div>
+        </div>
+      </div>
+      <div class="card-body" style="padding:0">
+        <div class="settings-mockup">
+          <div class="settings-section-header">Reminder Intervals</div>
+          <div class="settings-row"><div class="settings-label">🧍 站起来</div><div class="settings-value">45 min ▬▬▬▬●──</div></div>
+          <div class="settings-row"><div class="settings-label">💧 喝水</div><div class="settings-value">90 min ▬▬▬▬▬▬●</div></div>
+          <div class="settings-row"><div class="settings-label">🤸 拉伸</div><div class="settings-value">60 min ▬▬▬▬▬●─</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-header">
+        <div class="card-icon">📅</div>
+        <div>
+          <div class="card-title">Schedule — 工作时间 & 安静时段</div>
+          <div class="card-subtitle">只在工作时间内发送提醒；安静时段完全屏蔽</div>
+        </div>
+      </div>
+      <div class="card-body" style="padding:0">
+        <div class="settings-mockup">
+          <div class="settings-section-header">Work Hours</div>
+          <div class="settings-row"><div class="settings-label">开始时间</div><div class="settings-value">9:00 AM</div></div>
+          <div class="settings-row"><div class="settings-label">结束时间</div><div class="settings-value">6:00 PM</div></div>
+          <div class="settings-section-header">Quiet Hours</div>
+          <div class="settings-row"><div class="settings-label">启用安静时段</div><div class="settings-value">●</div></div>
+          <div class="settings-row"><div class="settings-label">从</div><div class="settings-value">10:00 PM</div></div>
+          <div class="settings-row"><div class="settings-label">到</div><div class="settings-value">7:00 AM</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🤖</div>
+        <div>
+          <div class="card-title">AI Coach — DeepSeek API Key</div>
+          <div class="card-subtitle">接入 AI 健康教练（后续功能，现可先跳过）</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <ol style="font-size:13px; color:var(--muted); padding-left:18px; line-height:2">
+          <li>前往 <strong style="color:var(--text)">platform.deepseek.com</strong> 注册并创建 API Key</li>
+          <li>将 Key 粘贴到 Settings → AI Coach → 输入框中</li>
+          <li>点击 "Save API Key" → Key 安全存储在 macOS Keychain</li>
+          <li>AI 教练功能将在后续版本中激活</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ 快速上手 -->
+  <div class="section">
+    <h2>⑥ 5 分钟快速上手</h2>
+    <div class="card">
+      <div class="card-body" style="padding:0">
+        <ul class="steps">
+          <li class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">确认菜单栏有 ♥ 图标</div>
+              <div class="step-desc">Mac 顶部右侧状态栏应该出现一个心形图标，说明 app 正在运行。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">允许通知权限</div>
+              <div class="step-desc">首次启动会弹出权限请求 → 点"允许"。没有弹出的话去 系统设置 → 通知 → HealthyMonitor → 打开。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">（可选）在 Settings 里调整间隔</div>
+              <div class="step-desc">默认：站立每 45 分钟、喝水每 90 分钟、拉伸每 60 分钟。根据自己习惯调整。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title">等待第一个提醒</div>
+              <div class="step-desc">引擎启动后约 1 分钟内会发送第一批提醒（上午 9 点到下午 6 点工作时间内）。</div>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <div class="step-title">收到通知 → 完成动作 → 点 Done ✓</div>
+              <div class="step-desc">每次点完 Done，弹窗里的圆环就会更新一次。</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ FAQ -->
+  <div class="section">
+    <h2>⑦ 常见问题</h2>
+    <div class="faq-item">
+      <div class="faq-q">为什么一直没有收到提醒？</div>
+      <div class="faq-a">检查：① 系统设置 → 通知 → HealthyMonitor → 确认"允许通知"已开启；② 当前时间是否在工作时间（默认 9:00–18:00）内；③ 菜单栏弹窗里没有点"暂停提醒"。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">圆环一直是空的/0%？</div>
+      <div class="faq-a">今天还没有触发任何提醒，或者触发了但没有点 Done/Skip/Snooze 而是直接关掉了通知。超过 5 分钟没有响应会被标记为"错过"，依然会被计入统计。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">关掉 app 之后提醒还会来吗？</div>
+      <div class="faq-a">不会。提醒依赖 app 在后台运行。只要 ♥ 图标在菜单栏可见，app 就是运行着的。建议设置为"登录时自动启动"（Settings 后续版本将添加此选项）。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Settings 点不开怎么办？</div>
+      <div class="faq-a">这是已知 bug，正在修复中。当前版本修复后，点 Settings 会先激活 app 再弹出设置窗口。</div>
+    </div>
+  </div>
+
+  <!-- ⑧ 路线图 -->
+  <div class="section">
+    <h2>⑧ 接下来的功能（路线图）</h2>
+    <div class="badge-row">
+      <span class="badge badge-green">✓ 当前可用</span>
+      <span class="badge badge-orange">⏳ 开发中</span>
+    </div>
+    <div class="card">
+      <div class="card-body" style="padding:0">
+        <table>
+          <thead><tr><th>功能</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td>菜单栏提醒 + 通知按钮</td><td><span class="badge badge-green" style="padding:3px 8px;font-size:11px">✓ 可用</span></td></tr>
+            <tr><td>每日合规率圆环</td><td><span class="badge badge-green" style="padding:3px 8px;font-size:11px">✓ 可用</span></td></tr>
+            <tr><td>Settings（间隔/工作时间）</td><td><span class="badge badge-green" style="padding:3px 8px;font-size:11px">✓ 可用</span></td></tr>
+            <tr><td>AI 健康教练（DeepSeek）</td><td><span class="badge badge-orange" style="padding:3px 8px;font-size:11px">⏳ Phase 2</span></td></tr>
+            <tr><td>iPhone 伴侣 app + 历史图表</td><td><span class="badge badge-orange" style="padding:3px 8px;font-size:11px">⏳ Phase 2</span></td></tr>
+            <tr><td>Apple Watch 快速确认</td><td><span class="badge badge-orange" style="padding:3px 8px;font-size:11px">⏳ Phase 2</span></td></tr>
+            <tr><td>登录时自动启动</td><td><span class="badge badge-orange" style="padding:3px 8px;font-size:11px">⏳ 即将</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center; color:var(--muted); font-size:12px; margin-top:40px;">HealthyMonitor v0.1 · 文档生成于 2026-05-12</p>
+
+</main>
+</body>
+</html>

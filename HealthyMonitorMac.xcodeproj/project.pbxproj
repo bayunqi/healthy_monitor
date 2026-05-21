@@ -1,0 +1,403 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		06F3B0A94799E988CE5C0382 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ABCEA54F51B6B47F04DD2 /* AppState.swift */; };
+		0B1D95CD2DFFA267F064306B /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA23E378E19F7594C04ACFE /* StatusBarController.swift */; };
+		4B83A212B56371F7F583D65D /* MacNotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A9293C5725C3D131BB848C /* MacNotificationDelegate.swift */; };
+		5622105635689C760EA9FD80 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D9597A9D7A0A8ABE12440B1 /* KeychainHelper.swift */; };
+		AD4844EFF8313F3AB76A7CF6 /* HealthyMonitorMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AA6FACF87BDE8D2881DD96 /* HealthyMonitorMacApp.swift */; };
+		B4830A4C22222BA4B54AC84E /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C83EAEBA02E860081B5CF93 /* MenuBarView.swift */; };
+		BB42A6110EB4ED815E4682F4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0540687604369B07C9D3F95D /* SettingsView.swift */; };
+		D0ADD5C231D123C4F6F4B300 /* HealthyMonitorCore in Frameworks */ = {isa = PBXBuildFile; productRef = 410E6132DCCAC5D2A4FFBF05 /* HealthyMonitorCore */; };
+		F07E82E35D56160138FA857F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04582B3CE5E4318AED24E482 /* AppDelegate.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		04582B3CE5E4318AED24E482 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		0540687604369B07C9D3F95D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		185D3169A96DA51802095A84 /* HealthyMonitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthyMonitor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C83EAEBA02E860081B5CF93 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		37AA6FACF87BDE8D2881DD96 /* HealthyMonitorMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthyMonitorMacApp.swift; sourceTree = "<group>"; };
+		4D9597A9D7A0A8ABE12440B1 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		A5C4B0F46B27F8CB7B305D82 /* HealthyMonitorCore */ = {isa = PBXFileReference; lastKnownFileType = folder; path = HealthyMonitorCore; sourceTree = SOURCE_ROOT; };
+		B5A9293C5725C3D131BB848C /* MacNotificationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacNotificationDelegate.swift; sourceTree = "<group>"; };
+		C51ABCEA54F51B6B47F04DD2 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		CFA23E378E19F7594C04ACFE /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A497A4FD4339451E4370E373 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0ADD5C231D123C4F6F4B300 /* HealthyMonitorCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2CBD23C06BB7F5607E8CE6F1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				185D3169A96DA51802095A84 /* HealthyMonitor.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5AEEB256B35E348C338D97FF /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				1C83EAEBA02E860081B5CF93 /* MenuBarView.swift */,
+				CFA23E378E19F7594C04ACFE /* StatusBarController.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		9254AFAAAA705401E84061B1 /* HealthyMonitorMac */ = {
+			isa = PBXGroup;
+			children = (
+				BECE8CA1356FD9C45DD1853B /* App */,
+				5AEEB256B35E348C338D97FF /* MenuBar */,
+				C039EC0CB5AF8ACB1D3AFDA7 /* Notifications */,
+				D3A834558A10D622F207FAA6 /* Windows */,
+			);
+			name = HealthyMonitorMac;
+			path = HealthyMonitorMac/Sources/HealthyMonitorMac;
+			sourceTree = "<group>";
+		};
+		9E94EDEB2E9E08D5BBDD5CCC = {
+			isa = PBXGroup;
+			children = (
+				9254AFAAAA705401E84061B1 /* HealthyMonitorMac */,
+				DC311E5A315291C94A1FAC6C /* Packages */,
+				2CBD23C06BB7F5607E8CE6F1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BECE8CA1356FD9C45DD1853B /* App */ = {
+			isa = PBXGroup;
+			children = (
+				04582B3CE5E4318AED24E482 /* AppDelegate.swift */,
+				C51ABCEA54F51B6B47F04DD2 /* AppState.swift */,
+				37AA6FACF87BDE8D2881DD96 /* HealthyMonitorMacApp.swift */,
+				4D9597A9D7A0A8ABE12440B1 /* KeychainHelper.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C039EC0CB5AF8ACB1D3AFDA7 /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				B5A9293C5725C3D131BB848C /* MacNotificationDelegate.swift */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
+		D3A834558A10D622F207FAA6 /* Windows */ = {
+			isa = PBXGroup;
+			children = (
+				0540687604369B07C9D3F95D /* SettingsView.swift */,
+			);
+			path = Windows;
+			sourceTree = "<group>";
+		};
+		DC311E5A315291C94A1FAC6C /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				A5C4B0F46B27F8CB7B305D82 /* HealthyMonitorCore */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D2757CC8DEF5595996101C87 /* HealthyMonitorMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 92DD663E47ECCE6F58D838E2 /* Build configuration list for PBXNativeTarget "HealthyMonitorMac" */;
+			buildPhases = (
+				7615A176E770B8477A372CF7 /* Sources */,
+				A497A4FD4339451E4370E373 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HealthyMonitorMac;
+			packageProductDependencies = (
+				410E6132DCCAC5D2A4FFBF05 /* HealthyMonitorCore */,
+			);
+			productName = HealthyMonitorMac;
+			productReference = 185D3169A96DA51802095A84 /* HealthyMonitor.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0A08E48C2403C5CD512B6218 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					D2757CC8DEF5595996101C87 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = A58CD50CC769C72CDCE10495 /* Build configuration list for PBXProject "HealthyMonitorMac" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 9E94EDEB2E9E08D5BBDD5CCC;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				27ABDDBED64A54B590F52DEB /* XCLocalSwiftPackageReference "HealthyMonitorCore" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 2CBD23C06BB7F5607E8CE6F1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D2757CC8DEF5595996101C87 /* HealthyMonitorMac */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7615A176E770B8477A372CF7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F07E82E35D56160138FA857F /* AppDelegate.swift in Sources */,
+				06F3B0A94799E988CE5C0382 /* AppState.swift in Sources */,
+				AD4844EFF8313F3AB76A7CF6 /* HealthyMonitorMacApp.swift in Sources */,
+				5622105635689C760EA9FD80 /* KeychainHelper.swift in Sources */,
+				4B83A212B56371F7F583D65D /* MacNotificationDelegate.swift in Sources */,
+				B4830A4C22222BA4B54AC84E /* MenuBarView.swift in Sources */,
+				BB42A6110EB4ED815E4682F4 /* SettingsView.swift in Sources */,
+				0B1D95CD2DFFA267F064306B /* StatusBarController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0A7C54184636B94CEDE53D8D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 35RA7VV85U;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		20D918CFDDDC75C44ADC0AAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				INFOPLIST_FILE = HealthyMonitorMac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				LSUIElement = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.healthymonitor.mac;
+				PRODUCT_NAME = HealthyMonitor;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		8B3E0D782381612DCDEFA582 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				INFOPLIST_FILE = HealthyMonitorMac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				LSUIElement = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.healthymonitor.mac;
+				PRODUCT_NAME = HealthyMonitor;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		FFC8181F2DFCAC5AC29E4A6D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 35RA7VV85U;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		92DD663E47ECCE6F58D838E2 /* Build configuration list for PBXNativeTarget "HealthyMonitorMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B3E0D782381612DCDEFA582 /* Debug */,
+				20D918CFDDDC75C44ADC0AAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A58CD50CC769C72CDCE10495 /* Build configuration list for PBXProject "HealthyMonitorMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFC8181F2DFCAC5AC29E4A6D /* Debug */,
+				0A7C54184636B94CEDE53D8D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		27ABDDBED64A54B590F52DEB /* XCLocalSwiftPackageReference "HealthyMonitorCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = HealthyMonitorCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		410E6132DCCAC5D2A4FFBF05 /* HealthyMonitorCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HealthyMonitorCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 0A08E48C2403C5CD512B6218 /* Project object */;
+}

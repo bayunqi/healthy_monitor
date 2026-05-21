@@ -1,0 +1,28 @@
+name: HealthyMonitorMac
+options:
+  bundleIdPrefix: com.healthymonitor
+  deploymentTarget:
+    macOS: "14.0"
+
+packages:
+  HealthyMonitorCore:
+    path: HealthyMonitorCore
+
+targets:
+  HealthyMonitorMac:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: HealthyMonitorMac/Sources/HealthyMonitorMac
+    dependencies:
+      - package: HealthyMonitorCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.healthymonitor.mac
+        PRODUCT_NAME: HealthyMonitor
+        INFOPLIST_FILE: HealthyMonitorMac/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: "6.0"
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        LSUIElement: YES

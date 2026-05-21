@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthyMonitor — Product & Architecture Plan</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #222536;
+      --border: #2e3248;
+      --accent: #4f9cf9;
+      --accent2: #7c6af7;
+      --green: #3ecf8e;
+      --yellow: #f7c948;
+      --red: #f06a6a;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --radius: 10px;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+      --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+
+    /* Layout */
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0; width: 220px;
+      background: var(--surface); border-right: 1px solid var(--border);
+      padding: 28px 0; overflow-y: auto; z-index: 100;
+    }
+    .sidebar-logo {
+      padding: 0 20px 20px;
+      font-size: 16px; font-weight: 700; color: var(--accent);
+      border-bottom: 1px solid var(--border); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sidebar-logo .emoji { font-size: 20px; }
+    .nav-section { padding: 8px 20px 4px; font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .nav a {
+      display: block; padding: 7px 20px; color: var(--muted);
+      font-size: 13px; transition: all .15s;
+    }
+    .nav a:hover { color: var(--text); background: var(--surface2); }
+
+    .main { margin-left: 220px; padding: 48px 56px; max-width: 1000px; }
+
+    /* Sections */
+    .section { margin-bottom: 72px; }
+    h1 { font-size: 36px; font-weight: 800; letter-spacing: -.03em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 8px; }
+    .subtitle { color: var(--muted); font-size: 16px; margin-bottom: 40px; }
+    h2 { font-size: 22px; font-weight: 700; color: var(--text);
+      margin-bottom: 20px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--border); }
+    h3 { font-size: 15px; font-weight: 600; color: var(--accent);
+      margin: 24px 0 10px; text-transform: uppercase; letter-spacing: .06em; }
+    p { color: var(--muted); margin-bottom: 12px; }
+    ul { list-style: none; padding-left: 0; }
+    ul li { color: var(--muted); padding: 4px 0 4px 18px; position: relative; }
+    ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+
+    /* Cards */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px;
+    }
+    .card-icon { font-size: 28px; margin-bottom: 10px; }
+    .card-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .card-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+    th { background: var(--surface2); color: var(--muted); font-weight: 600;
+      text-transform: uppercase; letter-spacing: .06em; font-size: 11px;
+      padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--muted); }
+    tr:hover td { background: var(--surface); }
+    .pill {
+      display: inline-block; padding: 2px 8px; border-radius: 99px;
+      font-size: 11px; font-weight: 600;
+    }
+    .pill-green { background: rgba(62,207,142,.15); color: var(--green); }
+    .pill-blue { background: rgba(79,156,249,.15); color: var(--accent); }
+    .pill-yellow { background: rgba(247,201,72,.15); color: var(--yellow); }
+    .pill-red { background: rgba(240,106,106,.15); color: var(--red); }
+
+    /* Code blocks */
+    pre {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px; overflow-x: auto;
+      font-family: var(--mono); font-size: 12px; line-height: 1.7;
+      color: #a0b0c8; margin-bottom: 20px;
+    }
+    code { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+
+    /* Phase timeline */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before {
+      content: ''; position: absolute; left: 7px; top: 0; bottom: 0;
+      width: 2px; background: var(--border);
+    }
+    .timeline-item { position: relative; margin-bottom: 32px; }
+    .timeline-dot {
+      position: absolute; left: -24px; top: 4px;
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid var(--accent); background: var(--bg);
+    }
+    .timeline-dot.done { background: var(--green); border-color: var(--green); }
+    .timeline-dot.active { background: var(--accent); box-shadow: 0 0 0 4px rgba(79,156,249,.2); }
+    .timeline-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--accent); margin-bottom: 4px;
+    }
+    .timeline-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .timeline-body { font-size: 13px; color: var(--muted); }
+    .timeline-tasks { margin-top: 10px; }
+    .timeline-tasks li { font-size: 13px; padding: 3px 0 3px 18px; }
+
+    /* KPI bar */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+    .kpi-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px;
+    }
+    .kpi-value { font-size: 28px; font-weight: 800; color: var(--green); line-height: 1; }
+    .kpi-label { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    /* Test pyramid */
+    .pyramid { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 24px 0; }
+    .pyramid-row {
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px; color: var(--text); font-size: 12px; font-weight: 600;
+      padding: 10px 20px; text-align: center;
+    }
+
+    /* Stack diagram */
+    .stack-layer {
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px 20px; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .stack-icon { font-size: 22px; width: 32px; text-align: center; }
+    .stack-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .stack-detail { font-size: 12px; color: var(--muted); }
+
+    /* Callout */
+    .callout {
+      border-left: 3px solid var(--accent); background: rgba(79,156,249,.07);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 14px 18px; margin-bottom: 20px;
+    }
+    .callout p { margin: 0; color: var(--text); font-size: 13px; }
+    .callout strong { color: var(--accent); }
+
+    .callout.warning { border-color: var(--yellow); background: rgba(247,201,72,.07); }
+    .callout.warning p { color: var(--text); }
+    .callout.warning strong { color: var(--yellow); }
+
+    .callout.success { border-color: var(--green); background: rgba(62,207,142,.07); }
+    .callout.success strong { color: var(--green); }
+
+    /* Header hero */
+    .hero {
+      background: linear-gradient(135deg, rgba(79,156,249,.08), rgba(124,106,247,.08));
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 40px 44px; margin-bottom: 48px;
+    }
+    .hero-tag {
+      display: inline-block; background: rgba(79,156,249,.15);
+      color: var(--accent); border-radius: 6px; padding: 4px 10px;
+      font-size: 11px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; margin-bottom: 16px;
+    }
+    .meta-row { display: flex; gap: 24px; margin-top: 20px; flex-wrap: wrap; }
+    .meta-item { font-size: 13px; color: var(--muted); }
+    .meta-item strong { color: var(--text); }
+
+    /* scroll-margin for anchors */
+    [id] { scroll-margin-top: 24px; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar nav -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <span class="emoji">🫀</span> HealthyMonitor
+  </div>
+  <div class="nav-section">Product</div>
+  <div class="nav">
+    <a href="#vision">Vision & Pain Points</a>
+    <a href="#features">Feature Set</a>
+    <a href="#ux">UX Principles</a>
+    <a href="#journey">User Journey</a>
+  </div>
+  <div class="nav-section">Architecture</div>
+  <div class="nav">
+    <a href="#platforms">Platform Strategy</a>
+    <a href="#stack">Tech Stack</a>
+    <a href="#llm">LLM Integration</a>
+    <a href="#data">Data Models</a>
+    <a href="#notifications">Notifications</a>
+    <a href="#structure">File Structure</a>
+  </div>
+  <div class="nav-section">Roadmap</div>
+  <div class="nav">
+    <a href="#phases">Development Phases</a>
+    <a href="#phase1">Phase 1 MVP</a>
+    <a href="#phase2">Phase 2</a>
+    <a href="#phase3">Phase 3</a>
+  </div>
+  <div class="nav-section">Quality</div>
+  <div class="nav">
+    <a href="#testing">Testing Strategy</a>
+    <a href="#kpis">Behavioral KPIs</a>
+  </div>
+</nav>
+
+<!-- Main content -->
+<main class="main">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-tag">Product & Architecture Plan v1.0</div>
+    <h1>HealthyMonitor</h1>
+    <p class="subtitle" style="margin:0">LLM-powered personal health assistant for Apple ecosystem — built for programmers who sit too long.</p>
+    <div class="meta-row">
+      <div class="meta-item"><strong>Platform</strong> macOS + iOS + watchOS</div>
+      <div class="meta-item"><strong>Stack</strong> Swift / SwiftUI / Claude API</div>
+      <div class="meta-item"><strong>Phase 1 Target</strong> macOS menu bar MVP</div>
+      <div class="meta-item"><strong>North Star</strong> Pain score trending down in 8 weeks</div>
+    </div>
+  </div>
+
+  <!-- VISION -->
+  <div class="section" id="vision">
+    <h2>Vision & Pain Points</h2>
+    <div class="callout success">
+      <p><strong>North Star:</strong> "The app that made me actually stand up" — measurable behavior change, not just notification delivery. If the user's back pain score doesn't trend down within 8 weeks of consistent use, something is wrong with the product.</p>
+    </div>
+    <p>Most health reminder apps fail because they are <strong style="color:var(--text)">annoying and generic</strong>. They fire at rigid intervals, never learn from behavior, and become background noise within days.</p>
+    <p>HealthyMonitor wins by being <strong style="color:var(--text)">adaptive</strong>: it learns your schedule, your compliance patterns, and your pain points — then adjusts. The LLM coach feels like a knowledgeable colleague who checks in, not a nagging alarm.</p>
+
+    <h3>Who is this for?</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">💻</div>
+        <div class="card-title">Programmers & desk workers</div>
+        <div class="card-desc">8+ hours/day at a desk, often forgetting to stand, drink water, or stretch.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🍎</div>
+        <div class="card-title">Apple ecosystem users</div>
+        <div class="card-desc">Mac + iPhone + Apple Watch as daily tools. Notifications across all devices.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤕</div>
+        <div class="card-title">Chronic pain sufferers</div>
+        <div class="card-desc">Lower back, neck, wrist pain from poor posture and insufficient movement.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧠</div>
+        <div class="card-title">Self-improvers</div>
+        <div class="card-desc">Want data on their behavior, not just reminders — trend visibility matters.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="section" id="features">
+    <h2>Feature Set</h2>
+    <h3>Phase 1 MVP — Core Reminder Loop</h3>
+    <table>
+      <thead><tr><th>Feature</th><th>Description</th><th>Priority</th></tr></thead>
+      <tbody>
+        <tr><td>Heartbeat Reminder Engine</td><td>Time-based triggers: stand / drink / stretch with configurable intervals</td><td><span class="pill pill-red">P0</span></td></tr>
+        <tr><td>macOS Menu Bar App</td><td>Always-resident status indicator, quick confirm, pause controls, compliance ring</td><td><span class="pill pill-red">P0</span></td></tr>
+        <tr><td>Local Notification Delivery</td><td>UNUserNotificationCenter on Mac with action buttons: Done ✓ / Skip / Snooze</td><td><span class="pill pill-red">P0</span></td></tr>
+        <tr><td>Activity Confirmation & Log</td><td>Tap to log completion; persistent ActivityLog with timestamp, device, response type</td><td><span class="pill pill-red">P0</span></td></tr>
+        <tr><td>LLM Onboarding Coach</td><td>Conversational profile building at first launch (5–7 questions)</td><td><span class="pill pill-red">P0</span></td></tr>
+        <tr><td>Health Profile</td><td>Store pain points, work schedule, preferences, water goals, quiet hours</td><td><span class="pill pill-red">P0</span></td></tr>
+        <tr><td>Daily Compliance Stats</td><td>Computed daily stats: completion rate per reminder type, displayed in menu popover</td><td><span class="pill pill-red">P0</span></td></tr>
+        <tr><td>iOS Companion App</td><td>Onboarding, history, settings, LLM chat interface (Phase 1 basic)</td><td><span class="pill pill-blue">P1</span></td></tr>
+        <tr><td>watchOS Quick-Confirm</td><td>Haptic notification + single tap to confirm on wrist</td><td><span class="pill pill-blue">P1</span></td></tr>
+        <tr><td>Watch Complication</td><td>Daily compliance ring on Watch face</td><td><span class="pill pill-blue">P1</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Phase 2 — Intelligence Layer</h3>
+    <ul>
+      <li>Adaptive reminder intervals — LLM adjusts frequency based on 7-day compliance patterns</li>
+      <li>Sunday evening weekly coaching summary with specific data insights</li>
+      <li>Calendar & Focus integration (EventKit) — suppress during meetings</li>
+      <li>HealthKit write-back — stand minutes, water intake visible in Apple Health</li>
+      <li>History view with Swift Charts — compliance heatmap, trend lines</li>
+      <li>CloudKit sync — Mac ↔ iPhone in real time</li>
+    </ul>
+
+    <h3>Phase 3 — Health Outcomes</h3>
+    <ul>
+      <li>Watch accelerometer posture/movement detection</li>
+      <li>LLM-generated personalized exercise library</li>
+      <li>Weekly health trend reports (PDF export for doctor visits)</li>
+      <li>8-week pain score trend visualization</li>
+    </ul>
+  </div>
+
+  <!-- UX PRINCIPLES -->
+  <div class="section" id="ux">
+    <h2>UX Principles</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">⚡️</div>
+        <div class="card-title">Zero-friction confirmation</div>
+        <div class="card-desc">One tap — always. Never more than one interaction step to log an activity.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔕</div>
+        <div class="card-title">Silence is respected</div>
+        <div class="card-desc">Quiet hours, Focus mode, and meeting detection are first-class citizens, not afterthoughts.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">💚</div>
+        <div class="card-title">No guilt, only curiosity</div>
+        <div class="card-desc">A missed reminder gets "busy day?" not a broken streak warning. The coach encourages, never scolds.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🪄</div>
+        <div class="card-title">Contextually intelligent</div>
+        <div class="card-desc">Reminders arrive at smart moments — not rigid 45-minute clock intervals when you're in a meeting.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌿</div>
+        <div class="card-title">Lightweight footprint</div>
+        <div class="card-desc">Menu bar on Mac. No daily opens required on iPhone. Watch complication is the primary surface.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤝</div>
+        <div class="card-title">Colleague, not drill sergeant</div>
+        <div class="card-desc">LLM responses under 3 sentences. Warm and collegial tone. Evidence-based but never preachy.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- USER JOURNEY -->
+  <div class="section" id="journey">
+    <h2>User Journey</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot active"></div>
+        <div class="timeline-label">Day 0 — First Launch</div>
+        <div class="timeline-title">LLM Onboarding Conversation</div>
+        <div class="timeline-body">The coach introduces itself in 1–2 sentences and asks 5–7 natural questions: current pain symptoms, work hours, water goals, reminder style preference, quiet hours. At the end, it confirms the personalized plan and starts the heartbeat engine.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-label">Daily Use — Steady State</div>
+        <div class="timeline-title">The Reminder Loop</div>
+        <div class="timeline-body">Every N minutes: notification on Mac menu bar + Watch haptic (+ optional iPhone banner). User taps "Done" or raises wrist. Log entry created. Compliance ring updates. Occasionally the coach adds a brief contextual note.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-label">Sunday Evening</div>
+        <div class="timeline-title">Weekly Coaching Summary</div>
+        <div class="timeline-body">Coach sends a notification with a brief insight: "You drank water 73% of the time but only stretched 31% on Thursdays." Tapping opens a coaching chat with one actionable suggestion and a pain score check-in.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-label">Week 2+ — Adaptation</div>
+        <div class="timeline-title">Intelligent Schedule Adjustment</div>
+        <div class="timeline-body">LLM detects patterns in compliance data. Uses tool calls to adjust reminder intervals. If you snooze stretch reminders 80% of the time on Friday afternoons, it shifts them to Thursday or reduces frequency.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-label">Week 8</div>
+        <div class="timeline-title">Health Outcome Measurement</div>
+        <div class="timeline-body">Coach reviews 8 weeks of pain scores. If trending down with >60% compliance: the app is working. If not: adjust exercise types, reminder intervals, or conversation approach.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLATFORMS -->
+  <div class="section" id="platforms">
+    <h2>Platform Strategy</h2>
+    <div class="callout">
+      <p><strong>Build order:</strong> macOS menu bar → iOS companion → watchOS quick-confirm. The Mac is where the target user spends their day; the menu bar delivers 80% of the value immediately.</p>
+    </div>
+    <table>
+      <thead><tr><th>Platform</th><th>Phase</th><th>Primary Surface</th><th>Key APIs</th></tr></thead>
+      <tbody>
+        <tr><td><strong style="color:var(--text)">macOS</strong></td><td><span class="pill pill-red">Phase 1</span></td><td>Menu bar popover + local notifications</td><td>NSStatusBar, UNUserNotificationCenter</td></tr>
+        <tr><td><strong style="color:var(--text)">iOS</strong></td><td><span class="pill pill-yellow">Phase 2</span></td><td>Health profile, history charts, LLM chat</td><td>HealthKit, EventKit, Swift Charts</td></tr>
+        <tr><td><strong style="color:var(--text)">watchOS</strong></td><td><span class="pill pill-yellow">Phase 2</span></td><td>Haptic notification + complication ring</td><td>WatchConnectivity, WKInterfaceController</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TECH STACK -->
+  <div class="section" id="stack">
+    <h2>Tech Stack</h2>
+    <div class="stack-layer" style="border-color: rgba(79,156,249,.4);">
+      <div class="stack-icon">🎨</div>
+      <div><div class="stack-name">SwiftUI 6</div><div class="stack-detail">All UI across macOS, iOS, watchOS — shared via HealthyMonitorCore Swift Package</div></div>
+    </div>
+    <div class="stack-layer">
+      <div class="stack-icon">📦</div>
+      <div><div class="stack-name">HealthyMonitorCore (Swift Package)</div><div class="stack-detail">Shared business logic: ReminderEngine, ActivityLogger, LLMService, Models</div></div>
+    </div>
+    <div class="stack-layer">
+      <div class="stack-icon">💾</div>
+      <div><div class="stack-name">Swift Data + CloudKit</div><div class="stack-detail">Local persistence with zero-cost, end-to-end-encrypted cross-device sync. No backend server.</div></div>
+    </div>
+    <div class="stack-layer" style="border-color: rgba(124,106,247,.4);">
+      <div class="stack-icon">🤖</div>
+      <div><div class="stack-name">Claude API (claude-sonnet-4-6)</div><div class="stack-detail">LLM coaching with prompt caching on health profile + tool use for structured outputs. Direct calls from iOS, key in Keychain.</div></div>
+    </div>
+    <div class="stack-layer">
+      <div class="stack-icon">🔔</div>
+      <div><div class="stack-name">UNUserNotificationCenter (local)</div><div class="stack-detail">Local notification scheduling on each device. No APNS server infrastructure for MVP.</div></div>
+    </div>
+    <div class="stack-layer">
+      <div class="stack-icon">⌚</div>
+      <div><div class="stack-name">WatchConnectivity</div><div class="stack-detail">iPhone ↔ Watch real-time message passing for confirmations and health data sync</div></div>
+    </div>
+  </div>
+
+  <!-- LLM INTEGRATION -->
+  <div class="section" id="llm">
+    <h2>LLM Integration Design</h2>
+    <h3>Prompt Cache Architecture</h3>
+    <pre>┌─────────────────────────────────────────────────────────┐
+│  CACHED BLOCK 1 — System Prompt (rarely changes)        │
+│  HealthCoach persona + instructions + tone guidelines   │
+├─────────────────────────────────────────────────────────┤
+│  CACHED BLOCK 2 — Health Profile (updated weekly)       │
+│  Pain points, schedule, goals, reminder preferences     │
+├─────────────────────────────────────────────────────────┤
+│  DYNAMIC — Conversation History (last 10 messages)      │
+├─────────────────────────────────────────────────────────┤
+│  DYNAMIC — Current User Message                         │
+└─────────────────────────────────────────────────────────┘
+
+  Cache hit rate: ~80%+ for daily coaching conversations
+  (Health profile changes at most weekly)</pre>
+
+    <h3>Tool Use Schema</h3>
+    <table>
+      <thead><tr><th>Tool</th><th>When Used</th><th>Key Fields</th></tr></thead>
+      <tbody>
+        <tr><td><code>update_health_profile</code></td><td>Onboarding + any conversation that reveals new info</td><td>painPoints, workSchedule, goals, reminderPreferences</td></tr>
+        <tr><td><code>adjust_reminder_schedule</code></td><td>When compliance data suggests interval tuning needed</td><td>intervalMinutes per type, quietHoursStart/End</td></tr>
+        <tr><td><code>log_observation</code></td><td>Weekly summaries, pattern detection</td><td>observation, category (compliance/pain/improvement), severity</td></tr>
+      </tbody>
+    </table>
+
+    <h3>System Prompt</h3>
+    <pre>You are HealthCoach, a warm and supportive personal health assistant
+for a programmer with back/waist pain from prolonged sitting.
+
+Your role:
+1. Build genuine understanding through natural conversation
+2. Remind users to take health breaks at the right moments
+3. Celebrate small wins; address missed reminders with curiosity, not guilt
+4. Provide evidence-based, practical advice for desk workers
+
+Tone: Collegial, never preachy. Max 3 sentences unless user asks for detail.
+
+Current health profile:
+{healthProfile}
+
+Today's activity summary:
+{todaysSummary}</pre>
+  </div>
+
+  <!-- DATA MODELS -->
+  <div class="section" id="data">
+    <h2>Data Models</h2>
+    <pre>// HealthProfile — Swift Data + CloudKit
+@Model final class HealthProfile {
+    var userId: String
+    var painPoints: [String]          // ["lower back", "neck"]
+    var workScheduleStart: Date       // 09:00
+    var workScheduleEnd: Date         // 18:00
+    var quietHoursStart: Date?
+    var quietHoursEnd: Date?
+    var reminderStyle: ReminderStyle  // .gentle | .firm | .silentOnlyWatch
+    var waterGoalMl: Int              // 2000
+    var llmConversationHistory: Data  // last 50 messages, serialized
+    var onboardingCompleted: Bool
+    var lastWeeklyPainScore: Int?     // 1–10
+}
+
+// ReminderConfig — local only (per device)
+@Model final class ReminderConfig {
+    var type: ReminderType            // .stand | .water | .stretch | .exercise
+    var intervalMinutes: Int          // 45
+    var isEnabled: Bool
+    var lastFiredAt: Date?
+    var nextScheduledAt: Date?
+}
+
+// ActivityLog — Swift Data + CloudKit
+@Model final class ActivityLog {
+    var id: UUID
+    var reminderType: ReminderType
+    var scheduledAt: Date
+    var respondedAt: Date?
+    var response: ActivityResponse    // .completed | .skipped | .snoozed | .missed
+    var deviceSource: String          // "mac" | "iphone" | "watch"
+}
+
+// DailyStats — computed from ActivityLog queries
+struct DailyStats {
+    let date: Date
+    let totalReminders: Int
+    let completed: Int
+    var complianceRate: Double { Double(completed) / Double(totalReminders) }
+    let byType: [ReminderType: Int]
+}</pre>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="section" id="notifications">
+    <h2>Notification Architecture</h2>
+    <pre>macOS Menu Bar App (always running)
+  └── UNUserNotificationCenter — schedules all local notifications
+       ├── Action: "Done ✓"   → ActivityLog.response = .completed
+       ├── Action: "Skip"     → ActivityLog.response = .skipped
+       └── Action: "Snooze"   → reschedule +10 min, increment snoozeCount
+
+iPhone (optional, for users with phone nearby)
+  └── UNUserNotificationCenter — independent local schedule
+       └── UNNotificationContentExtension — rich notification UI
+
+watchOS (forwarded from iPhone via WatchConnectivity)
+  └── WKUserNotificationHostingController
+       └── Haptic feedback + single-tap confirm
+       └── Complication updates via CLKComplicationDataSource</pre>
+    <div class="callout warning">
+      <p><strong>MVP Decision:</strong> Local notifications only — no Apple Push Notification Service. The macOS menu bar app is the authoritative scheduler (it's always running). This eliminates all server infrastructure costs while delivering identical UX.</p>
+    </div>
+  </div>
+
+  <!-- FILE STRUCTURE -->
+  <div class="section" id="structure">
+    <h2>Repository Structure</h2>
+    <pre>healthy_monitor/
+├── HealthyMonitorCore/            ← Swift Package (shared logic)
+│   ├── Package.swift
+│   └── Sources/HealthyMonitorCore/
+│       ├── Models/                ← HealthProfile, ReminderConfig, ActivityLog
+│       ├── Services/
+│       │   ├── ReminderEngine.swift      ← heartbeat scheduler (core)
+│       │   ├── ActivityLogger.swift      ← log writes + queries
+│       │   ├── LLMService.swift          ← Claude API client
+│       │   ├── HealthProfileService.swift
+│       │   └── NotificationService.swift
+│       ├── Persistence/
+│       │   ├── SwiftDataContainer.swift
+│       │   └── CloudKitSync.swift
+│       └── Utilities/
+│           ├── DateHelpers.swift
+│           └── PromptBuilder.swift       ← assembles LLM prompts
+│
+├── HealthyMonitorMac/             ← macOS target (Phase 1)
+│   └── Sources/
+│       ├── App/HealthyMonitorMacApp.swift ← @main + NSStatusBar setup
+│       ├── MenuBar/
+│       │   ├── StatusBarController.swift
+│       │   ├── MenuBarView.swift          ← SwiftUI popover
+│       │   └── QuickActionsView.swift
+│       ├── Windows/SettingsView.swift
+│       └── Notifications/MacNotificationDelegate.swift
+│
+├── HealthyMonitor/                ← iOS target (Phase 2)
+├── HealthyMonitorWatch/           ← watchOS target (Phase 2)
+│
+├── Scripts/
+│   ├── test-notifications.sh     ← fire test notification, verify log
+│   ├── test-llm-integration.sh   ← run LLM quality tests (weekly)
+│   ├── build-all-targets.sh      ← build Mac + iOS + Watch
+│   └── seed-test-data.sh         ← populate 7 days synthetic data
+│
+├── docs/plan.html                ← this document
+├── CLAUDE.md                     ← project bible for AI agents
+├── PROGRESS.md                   ← handoff tracker + weekly KPIs
+├── DECISIONS.md                  ← architecture decision records
+└── README.md</pre>
+  </div>
+
+  <!-- PHASES -->
+  <div class="section" id="phases">
+    <h2>Development Phases</h2>
+
+    <div id="phase1">
+      <h3>Phase 1 — "Does it actually remind me?" (Weeks 1–6)</h3>
+      <table>
+        <thead><tr><th>Week</th><th>Deliverable</th><th>Success Criteria</th></tr></thead>
+        <tbody>
+          <tr><td>1–2</td><td>HealthyMonitorCore: ReminderEngine + ActivityLogger + Swift Data models</td><td>Unit tests pass; reminder timing within 1 second of target</td></tr>
+          <tr><td>3–4</td><td>macOS menu bar app: NSStatusItem, local notifications, action buttons, compliance ring</td><td>Reminders fire and are confirmed without opening any window</td></tr>
+          <tr><td>5</td><td>LLM onboarding: LLMService with Claude API + prompt caching + tool use</td><td>Health profile populated from natural conversation in <5 minutes</td></tr>
+          <tr><td>6</td><td>Integration testing + 7-day self-use period</td><td>Daily compliance rate tracked; user stands up more</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="phase2" style="margin-top:24px">
+      <h3>Phase 2 — "Does it get smarter?" (Weeks 7–12)</h3>
+      <ul>
+        <li>iOS companion app with dashboard, history, LLM chat interface</li>
+        <li>CloudKit sync (Mac ↔ iPhone, <30 second latency)</li>
+        <li>watchOS quick-confirm + complication</li>
+        <li>Adaptive reminder intervals via LLM tool calls</li>
+        <li>Weekly Sunday coaching summary</li>
+        <li>HealthKit write-back + EventKit meeting suppression</li>
+      </ul>
+    </div>
+
+    <div id="phase3" style="margin-top:24px">
+      <h3>Phase 3 — "Does it improve health?" (Weeks 13–20)</h3>
+      <ul>
+        <li>Watch accelerometer posture/movement detection</li>
+        <li>Personalized LLM-generated exercise routines</li>
+        <li>8-week pain score trend visualization</li>
+        <li>Weekly PDF health report (for doctor visits)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TESTING -->
+  <div class="section" id="testing">
+    <h2>Testing Strategy</h2>
+    <div class="callout success">
+      <p><strong>Guiding principle:</strong> Every test layer answers the same question — "Is the user's health actually improving?" Unit tests verify correctness; behavioral KPIs verify outcomes.</p>
+    </div>
+
+    <div class="pyramid">
+      <div class="pyramid-row" style="width:100%; background: rgba(240,106,106,.12); color: var(--red);">
+        Layer 4: Behavioral KPIs — Pain score, compliance rate, engagement
+      </div>
+      <div class="pyramid-row" style="width:80%; background: rgba(247,201,72,.1); color: var(--yellow);">
+        Layer 3: LLM Quality Tests (weekly) — Golden-set, tool use accuracy
+      </div>
+      <div class="pyramid-row" style="width:60%; background: rgba(79,156,249,.1); color: var(--accent);">
+        Layer 2: Integration Tests — Full remind → confirm → log E2E cycle
+      </div>
+      <div class="pyramid-row" style="width:40%; background: rgba(62,207,142,.1); color: var(--green);">
+        Layer 1: Unit Tests — ReminderEngine, ActivityLogger, LLMService
+      </div>
+    </div>
+
+    <h3>Layer 1 — Unit Tests (every PR)</h3>
+    <ul>
+      <li><code>testStandReminderFiresAfter45Minutes()</code></li>
+      <li><code>testWaterReminderDoesNotFireDuringQuietHours()</code></li>
+      <li><code>testSnoozeDelaysNextReminderByConfiguredDuration()</code></li>
+      <li><code>testReminderEngineResumeAfterAppRestart()</code></li>
+      <li><code>testCompletedActivityWritesToPersistence()</code></li>
+      <li><code>testDailyStatsComplianceRateCalculation()</code></li>
+      <li><code>testOnboardingExtractionUpdatesHealthProfile()</code> (mocked API)</li>
+      <li><code>testPromptCachingBreakpointsAreCorrect()</code></li>
+    </ul>
+
+    <h3>Layer 2 — Integration Tests (every PR)</h3>
+    <p>The core E2E cycle:</p>
+    <pre>1. Schedule reminder 5 seconds in the future
+2. Wait for notification delivery (assert within 6 seconds)
+3. Simulate "Done" action tap
+4. Assert: ActivityLog entry exists with response = .completed
+5. Assert: next reminder is scheduled
+6. Assert: DailyStats compliance rate reflects the completion</pre>
+    <p>Also test: skip, snooze, missed-grace-period, CloudKit sync latency &lt;30s.</p>
+
+    <h3>Layer 3 — LLM Quality Tests (weekly, not per-PR)</h3>
+    <ul>
+      <li><code>testOnboardingExtractsPainPointsCorrectly()</code> — given natural language → verify structured profile</li>
+      <li><code>testCoachDoesNotGuiltTripMissedReminders()</code> — assert no guilt language on 5 missed reminders</li>
+      <li><code>testAdaptiveIntervalDecreaseForLowCompliance()</code> — verify tool call fires when 30% compliance</li>
+      <li><code>testWeeklyInsightContainsSpecificData()</code> — coach must cite actual numbers from logs</li>
+    </ul>
+  </div>
+
+  <!-- KPIs -->
+  <div class="section" id="kpis">
+    <h2>Behavioral KPIs — The Real Test</h2>
+    <p>Tracked weekly in PROGRESS.md. These prove whether the app is working, not just running.</p>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-value">&gt;65%</div>
+        <div class="kpi-label">Daily Compliance Rate (target, 30 days)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">&gt;70%</div>
+        <div class="kpi-label">Stand Reminder Compliance</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">&lt;60s</div>
+        <div class="kpi-label">Notification Response Time (median)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">&lt;25%</div>
+        <div class="kpi-label">Snooze Rate</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">&lt;20%</div>
+        <div class="kpi-label">Miss Rate (no response)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">&gt;40%</div>
+        <div class="kpi-label">LLM Engagement Rate (weekly)</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:20px">
+      <p><strong>Ultimate test:</strong> The LLM coach asks every Sunday: "On a scale of 1–10, how is your back/neck pain compared to last week?" A downward trend over 8–12 weeks with &gt;60% compliance proves the app is working. If not → adjust exercise types, reminder intervals, or coaching approach.</p>
+    </div>
+  </div>
+
+  <div style="padding: 40px 0; border-top: 1px solid var(--border); color: var(--muted); font-size: 12px; text-align: center;">
+    HealthyMonitor Plan v1.0 · Generated 2026-05-11 · Swift/SwiftUI + Claude API
+  </div>
+
+</main>
+</body>
+</html>

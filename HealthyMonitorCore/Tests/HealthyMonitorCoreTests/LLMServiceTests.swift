@@ -222,4 +222,48 @@ struct HealthProfileServiceTests {
         #expect(after.profileVersion == v0 + 1)
         #expect(after.painPoints == ["lower back"])
     }
+
+    // MARK: - Bug 3A: per-type enabled toggle persistence
+
+    @Test("isReminderEnabled defaults to true for unset types (legacy profiles)")
+    func enabledDefaultsTrue() {
+        let profile = HealthProfileData()
+        #expect(profile.isReminderEnabled(.stand))
+        #expect(profile.isReminderEnabled(.water))
+        #expect(profile.isReminderEnabled(.stretch))
+    }
+
+    @Test("reminderEnabled persists across save+reload")
+    func enabledPersistsAcrossLaunches() async throws {
+        let repo = InMemoryHealthProfileRepository()
+        let service = HealthProfileService(repository: repo)
+        var profile = try await service.currentProfile()
+        profile.reminderEnabled = ["stand": false, "water": true]
+        try await service.save(profile)
+
+        let fresh = HealthProfileService(repository: repo)
+        let loaded = try await fresh.currentProfile()
+        #expect(loaded.isReminderEnabled(.stand) == false)
+        #expect(loaded.isReminderEnabled(.water) == true)
+        #expect(loaded.isReminderEnabled(.stretch) == true,  // unset → default true
+                "Unset reminder types should default to enabled")
+    }
+
+    @Test("Legacy v1 profile JSON (no reminderEnabled key) decodes cleanly")
+    func legacyJSONDecodes() throws {
+        // Synthetic v1-era profile JSON — has all v1 fields, no reminderEnabled.
+        let legacyJSON = #"""
+        {
+          "userId":"u-1","displayName":"","painPoints":[],
+          "workScheduleStartHour":9,"workScheduleEndHour":18,
+          "reminderStyle":"gentle","waterGoalMl":2000,
+          "onboardingCompleted":false,"conversationHistory":[],
+          "createdAt":700000000,"profileVersion":1,
+          "reminderIntervalMinutes":{"stand":45},"learnedFocusStartHours":{}
+        }
+        """#.data(using: .utf8)!
+        let decoded = try JSONDecoder().decode(HealthProfileData.self, from: legacyJSON)
+        #expect(decoded.reminderEnabled == nil)
+        #expect(decoded.isReminderEnabled(.stand))
+    }
 }

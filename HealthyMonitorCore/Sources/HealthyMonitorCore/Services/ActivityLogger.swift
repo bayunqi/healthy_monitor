@@ -5,10 +5,11 @@ import Foundation
 
 /// Implemented by the app target using SwiftData; implemented by InMemoryActivityLogRepository in tests.
 public protocol ActivityLogRepository: Sendable {
-    func createEntry(type: ReminderType, scheduledAt: Date, deviceSource: String) async throws -> ActivityLogEntry
+    func createEntry(type: ReminderType, scheduledAt: Date, deviceSource: String, focusSessionId: UUID?) async throws -> ActivityLogEntry
     func recordResponse(for id: UUID, response: ActivityResponse) async throws
     func markStaleMissed(gracePeriodMinutes: Int) async throws
     func logs(from: Date, to: Date) async throws -> [ActivityLogEntry]
+    func logs(for sessionId: UUID) async throws -> [ActivityLogEntry]
     func recentLogs(limit: Int) async throws -> [ActivityLogEntry]
 }
 
@@ -19,8 +20,8 @@ public actor InMemoryActivityLogRepository: ActivityLogRepository {
 
     public init() {}
 
-    public func createEntry(type: ReminderType, scheduledAt: Date, deviceSource: String = "mac") async throws -> ActivityLogEntry {
-        let entry = ActivityLogEntry(type: type, scheduledAt: scheduledAt, deviceSource: deviceSource)
+    public func createEntry(type: ReminderType, scheduledAt: Date, deviceSource: String = "mac", focusSessionId: UUID? = nil) async throws -> ActivityLogEntry {
+        let entry = ActivityLogEntry(type: type, scheduledAt: scheduledAt, deviceSource: deviceSource, focusSessionId: focusSessionId)
         entries[entry.id] = entry
         return entry
     }
@@ -44,6 +45,12 @@ public actor InMemoryActivityLogRepository: ActivityLogRepository {
     public func logs(from: Date, to: Date) async throws -> [ActivityLogEntry] {
         entries.values
             .filter { $0.scheduledAt >= from && $0.scheduledAt <= to }
+            .sorted { $0.scheduledAt < $1.scheduledAt }
+    }
+
+    public func logs(for sessionId: UUID) async throws -> [ActivityLogEntry] {
+        entries.values
+            .filter { $0.focusSessionId == sessionId }
             .sorted { $0.scheduledAt < $1.scheduledAt }
     }
 
@@ -72,8 +79,8 @@ public actor ActivityLogger {
     }
 
     @discardableResult
-    public func createEntry(type: ReminderType, scheduledAt: Date, deviceSource: String = "mac") async throws -> ActivityLogEntry {
-        try await repository.createEntry(type: type, scheduledAt: scheduledAt, deviceSource: deviceSource)
+    public func createEntry(type: ReminderType, scheduledAt: Date, deviceSource: String = "mac", focusSessionId: UUID? = nil) async throws -> ActivityLogEntry {
+        try await repository.createEntry(type: type, scheduledAt: scheduledAt, deviceSource: deviceSource, focusSessionId: focusSessionId)
     }
 
     public func recordResponse(for id: UUID, response: ActivityResponse) async throws {
@@ -87,6 +94,16 @@ public actor ActivityLogger {
     public func dailyStats(for date: Date) async throws -> DailyStats {
         let logs = try await repository.logs(from: date.startOfDay, to: date.endOfDay)
         return computeStats(from: logs, date: date)
+    }
+
+    /// Compliance stats for a single focus session — aggregates only entries tagged with `sessionId`.
+    public func sessionStats(for sessionId: UUID) async throws -> SessionStats {
+        let logs = try await repository.logs(for: sessionId)
+        return computeSessionStats(from: logs)
+    }
+
+    public func logs(for sessionId: UUID) async throws -> [ActivityLogEntry] {
+        try await repository.logs(for: sessionId)
     }
 
     public func weeklyStats(endingOn date: Date = .now) async throws -> WeeklyStats {
@@ -112,6 +129,14 @@ public actor ActivityLogger {
     // MARK: - Private
 
     private func computeStats(from logs: [ActivityLogEntry], date: Date) -> DailyStats {
+        DailyStats(date: date, byType: groupByType(logs))
+    }
+
+    private func computeSessionStats(from logs: [ActivityLogEntry]) -> SessionStats {
+        SessionStats(byType: groupByType(logs))
+    }
+
+    private func groupByType(_ logs: [ActivityLogEntry]) -> [ReminderType: DailyStats.TypeStats] {
         var byType: [ReminderType: DailyStats.TypeStats] = [:]
         let grouped = Dictionary(grouping: logs, by: \.type)
         for (type, typeLogs) in grouped {
@@ -123,6 +148,6 @@ public actor ActivityLogger {
                 missed:    typeLogs.filter { $0.response == .missed }.count
             )
         }
-        return DailyStats(date: date, byType: byType)
+        return byType
     }
 }

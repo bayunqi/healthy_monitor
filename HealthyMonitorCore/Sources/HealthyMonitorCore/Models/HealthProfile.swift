@@ -20,6 +20,10 @@ public struct HealthProfileData: Codable, Sendable {
     public var profileVersion: Int
     public var reminderIntervalMinutes: [String: Int]
     public var learnedFocusStartHours: [Int: Int]
+    /// Per-type enabled toggle. Keyed by `ReminderType.rawValue` to stay JSON-friendly.
+    /// Optional so legacy v1 profile JSON (which doesn't have this key) decodes cleanly.
+    /// Missing keys / nil are treated as enabled.
+    public var reminderEnabled: [String: Bool]?
 
     public init(
         userId: String = UUID().uuidString,
@@ -48,5 +52,11 @@ public struct HealthProfileData: Codable, Sendable {
         self.profileVersion = 1
         self.reminderIntervalMinutes = [:]
         self.learnedFocusStartHours = [:]
+        self.reminderEnabled = nil
+    }
+
+    /// Returns true if the given reminder type is enabled. Missing entries default to enabled.
+    public func isReminderEnabled(_ type: ReminderType) -> Bool {
+        reminderEnabled?[type.rawValue] ?? true
     }
 }

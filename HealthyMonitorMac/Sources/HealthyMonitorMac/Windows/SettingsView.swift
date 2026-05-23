@@ -12,6 +12,9 @@ struct SettingsView: View {
     @State private var quietStart: Int = 22
     @State private var quietEnd: Int = 7
     @State private var apiKey: String = ""
+    @State private var standEnabled: Bool = true
+    @State private var waterEnabled: Bool = true
+    @State private var stretchEnabled: Bool = true
 
     var body: some View {
         TabView {
@@ -33,6 +36,20 @@ struct SettingsView: View {
 
     private var remindersTab: some View {
         Form {
+            Section("Enabled Reminders") {
+                Toggle("🧍 Stand up", isOn: $standEnabled)
+                    .onChange(of: standEnabled) { _, v in
+                        Task { await appState.setReminderEnabled(.stand, enabled: v) }
+                    }
+                Toggle("💧 Drink water", isOn: $waterEnabled)
+                    .onChange(of: waterEnabled) { _, v in
+                        Task { await appState.setReminderEnabled(.water, enabled: v) }
+                    }
+                Toggle("🤸 Stretch", isOn: $stretchEnabled)
+                    .onChange(of: stretchEnabled) { _, v in
+                        Task { await appState.setReminderEnabled(.stretch, enabled: v) }
+                    }
+            }
             Section("Reminder Intervals") {
                 IntervalSlider(label: "🧍 Stand up", value: $standInterval, unit: "min")
                 IntervalSlider(label: "💧 Drink water", value: $waterInterval, unit: "min")
@@ -105,6 +122,9 @@ struct SettingsView: View {
         standInterval = Double(p.reminderIntervalMinutes[ReminderType.stand.rawValue] ?? ReminderType.stand.defaultIntervalMinutes)
         waterInterval = Double(p.reminderIntervalMinutes[ReminderType.water.rawValue] ?? ReminderType.water.defaultIntervalMinutes)
         stretchInterval = Double(p.reminderIntervalMinutes[ReminderType.stretch.rawValue] ?? ReminderType.stretch.defaultIntervalMinutes)
+        standEnabled = p.isReminderEnabled(.stand)
+        waterEnabled = p.isReminderEnabled(.water)
+        stretchEnabled = p.isReminderEnabled(.stretch)
         apiKey = KeychainHelper.loadAPIKey() ?? ""
     }
 

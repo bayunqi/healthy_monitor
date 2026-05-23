@@ -23,6 +23,8 @@ targets:
         PRODUCT_NAME: HealthyMonitor
         INFOPLIST_FILE: HealthyMonitorMac/Info.plist
         CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: HealthyMonitorMac/HealthyMonitorMac.entitlements
+        ENABLE_APP_SANDBOX: YES
         SWIFT_VERSION: "6.0"
         MACOSX_DEPLOYMENT_TARGET: "14.0"
         LSUIElement: YES

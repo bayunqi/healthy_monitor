@@ -22,8 +22,13 @@ final class MacNotificationDelegate: NSObject, UNUserNotificationCenterDelegate 
         var actionId = response.actionIdentifier
 
         if actionId == UNNotificationDefaultActionIdentifier {
-            // Banner tap: for reminders → mark done; for focus prompt → dismiss
-            actionId = category == "FOCUS_PROMPT" ? "DISMISS_PROMPT" : "DONE"
+            // Banner tap defaults: reminder → mark done; focus prompt → dismiss;
+            // check-in → "still focusing" (the user's attention is back).
+            switch category {
+            case "FOCUS_PROMPT":  actionId = "DISMISS_PROMPT"
+            case "FOCUS_CHECKIN": actionId = "STILL_FOCUSING"
+            default:               actionId = "DONE"
+            }
         }
 
         let info: [String: Any] = [

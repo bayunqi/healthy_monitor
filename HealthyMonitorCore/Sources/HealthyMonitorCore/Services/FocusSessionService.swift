@@ -4,7 +4,7 @@ import Foundation
 
 public protocol FocusSessionRepository: Sendable {
     func createSession() async throws -> FocusSession
-    func endSession(_ id: UUID, at date: Date) async throws -> FocusSession
+    func endSession(_ id: UUID, at date: Date, stats: SessionStats?, reason: FocusSessionEndReason) async throws -> FocusSession
     func allSessions() async throws -> [FocusSession]
     func save(_ sessions: [FocusSession]) async throws
 }
@@ -22,9 +22,11 @@ public actor InMemoryFocusSessionRepository: FocusSessionRepository {
         return session
     }
 
-    public func endSession(_ id: UUID, at date: Date) async throws -> FocusSession {
+    public func endSession(_ id: UUID, at date: Date, stats: SessionStats? = nil, reason: FocusSessionEndReason = .endedByUser) async throws -> FocusSession {
         guard sessions[id] != nil else { throw FocusSessionError.sessionNotFound }
         sessions[id]?.endedAt = date
+        sessions[id]?.stats = stats
+        sessions[id]?.endReason = reason
         return sessions[id]!
     }
 
@@ -63,12 +65,14 @@ public actor JSONFileFocusSessionRepository: FocusSessionRepository {
         return session
     }
 
-    public func endSession(_ id: UUID, at date: Date) async throws -> FocusSession {
+    public func endSession(_ id: UUID, at date: Date, stats: SessionStats? = nil, reason: FocusSessionEndReason = .endedByUser) async throws -> FocusSession {
         var all = try await allSessions()
         guard let idx = all.firstIndex(where: { $0.id == id }) else {
             throw FocusSessionError.sessionNotFound
         }
         all[idx].endedAt = date
+        all[idx].stats = stats
+        all[idx].endReason = reason
         try await persist(all)
         return all[idx]
     }
@@ -118,8 +122,17 @@ public actor FocusSessionService {
         try await repository.createSession()
     }
 
-    public func endSession(_ id: UUID) async throws -> FocusSession {
-        try await repository.endSession(id, at: .now)
+    public func endSession(_ id: UUID, stats: SessionStats? = nil, reason: FocusSessionEndReason = .endedByUser) async throws -> FocusSession {
+        try await repository.endSession(id, at: .now, stats: stats, reason: reason)
+    }
+
+    /// Most recently ended session, if any — used by the menu bar idle state.
+    public func mostRecentEndedSession() async throws -> FocusSession? {
+        let all = try await repository.allSessions()
+        return all
+            .filter { !$0.isActive }
+            .sorted { ($0.endedAt ?? $0.startedAt) > ($1.endedAt ?? $1.startedAt) }
+            .first
     }
 
     public func activeSession() async throws -> FocusSession? {

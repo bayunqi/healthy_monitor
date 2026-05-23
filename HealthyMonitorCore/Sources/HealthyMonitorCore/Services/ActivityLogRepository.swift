@@ -19,9 +19,9 @@ public actor JSONFileActivityLogRepository: ActivityLogRepository {
         return dir.appendingPathComponent("activitylog.json")
     }
 
-    public func createEntry(type: ReminderType, scheduledAt: Date, deviceSource: String = "mac") async throws -> ActivityLogEntry {
+    public func createEntry(type: ReminderType, scheduledAt: Date, deviceSource: String = "mac", focusSessionId: UUID? = nil) async throws -> ActivityLogEntry {
         var store = try await loadStore()
-        let entry = ActivityLogEntry(type: type, scheduledAt: scheduledAt, deviceSource: deviceSource)
+        let entry = ActivityLogEntry(type: type, scheduledAt: scheduledAt, deviceSource: deviceSource, focusSessionId: focusSessionId)
         store[entry.id] = entry
         try await persist(store)
         return entry
@@ -53,6 +53,13 @@ public actor JSONFileActivityLogRepository: ActivityLogRepository {
         let store = try await loadStore()
         return store.values
             .filter { $0.scheduledAt >= from && $0.scheduledAt <= to }
+            .sorted { $0.scheduledAt < $1.scheduledAt }
+    }
+
+    public func logs(for sessionId: UUID) async throws -> [ActivityLogEntry] {
+        let store = try await loadStore()
+        return store.values
+            .filter { $0.focusSessionId == sessionId }
             .sorted { $0.scheduledAt < $1.scheduledAt }
     }
 

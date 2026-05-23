@@ -55,6 +55,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             if rawAction == "DISMISS_PROMPT" { return }
 
+            // Focus check-in ("Still focusing?") actions
+            if rawAction == "STILL_FOCUSING" {
+                await appState.acknowledgeStillFocusing()
+                await appState.refreshStats()
+                return
+            }
+            if rawAction == "END_FOCUS" {
+                await appState.endFocusSession()
+                return
+            }
+
             // Reminder actions require log ID and type
             guard let logIdString = info["logId"] as? String,
                   let logId = UUID(uuidString: logIdString),

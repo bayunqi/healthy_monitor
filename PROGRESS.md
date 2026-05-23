@@ -4,9 +4,9 @@
 
 ## Current Phase: Phase 1 MVP — "Does it actually remind me?"
 
-**Last Updated:** 2026-05-21  
-**Next Milestone:** First build + run in Xcode → 7-day self-use period  
-**Target Milestone Date:** 2026-05-25 (Week 2)
+**Last Updated:** 2026-05-23  
+**Next Milestone:** 7-day self-use of v1.1  
+**Target Milestone Date:** 2026-05-30 (Week 3)
 
 ---
 
@@ -46,13 +46,21 @@
   - `KeychainHelper` (API key storage)
 - [2026-05-11] **XcodeGen project** generated at `HealthyMonitorMac.xcodeproj`
 - [2026-05-21] **v1 tagged** — pushed to `origin/main` and `origin/v1`. Xcode 26.3 confirmed installed locally. README rewritten in Apple product-introduction style. `.gitignore` added.
+- [2026-05-23] **v1.1 — Behavior & Persistence patch**
+  - **Bug 1 fix:** First reminder no longer fires immediately on focus start — now waits one full interval. `ReminderEngine.startFocusSession` anchors `lastFiredAt` to session start.
+  - **Bug 2 fix:** Compliance rate is now scoped per focus session (not app lifetime). `ActivityLogEntry.focusSessionId` links entries to their session; `FocusSession.stats` carries the final snapshot. Menu bar shows current-session stats while active and "Last session · X% · Yh ago" when idle.
+  - **Bug 3A fix:** Per-type `isEnabled` now persists to `profile.json` via `HealthProfileData.reminderEnabled` map. Settings exposes a toggle per reminder type. Legacy v1 profile JSON decodes cleanly (optional field).
+  - **Bug 3B (App Store readiness):** App Sandbox enabled via `HealthyMonitorMac.entitlements` (app-sandbox + network.client). Data lives in `~/Library/Containers/com.healthymonitor.mac/...`. Migration script at `Scripts/migrate-to-sandbox.sh` for v1 → v1.1 users.
+  - **Bug 4 (PM):** Two-stage focus auto-exit safety net. 2 consecutive missed reminders → "Still focusing?" check-in notification. 3 misses with no response → session auto-ends with `endReason = .autoEndedDueToInactivity`. Acknowledgment ("Yes, keep going") re-arms the threshold using a per-session inactivity floor.
+  - Test count: 41 → 73 (Bug 1: +3, Bug 2: +7, Bug 4: +6, Bug 3A: +3, plus general hardening).
+  - Architecture: introduced `NotificationScheduling` protocol so non-UI tests inject a `NoOpNotificationScheduler` instead of touching `UNUserNotificationCenter` (which can't initialize in SwiftPM test processes).
 
 ---
 
 ## In Progress
 
-- First build + run in Xcode on the development Mac
-- Setup on second Mac: clone → Xcode build → re-enter DeepSeek API key in Settings (Keychain is local, not iCloud-synced)
+- 7-day self-use of v1.1 — track behavioral KPIs in the table below
+- Validate two-stage auto-exit threshold (3 misses) under real usage; revisit if rate exceeds 20%
 
 ---
 

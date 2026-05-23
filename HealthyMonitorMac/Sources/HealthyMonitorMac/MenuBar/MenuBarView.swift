@@ -36,10 +36,14 @@ struct MenuBarView: View {
         .padding(.vertical, 12)
     }
 
+    /// Badge shows: current session compliance when active; last ended session when idle; "–" otherwise.
     private var complianceBadge: some View {
-        let stats = appState.todayStats
-        let hasData = stats.totalReminders > 0
-        let rate = stats.overallComplianceRate
+        let sessionStats = appState.activeFocusSession != nil
+            ? appState.currentSessionStats
+            : appState.lastEndedSession?.stats
+        let total = sessionStats?.totalReminders ?? 0
+        let hasData = total > 0
+        let rate = sessionStats?.overallComplianceRate ?? 0
         let label = hasData ? "\(Int(rate * 100))%" : "–"
         let badgeColor = hasData ? color(for: rate) : Color.secondary
         return Text(label)
@@ -61,6 +65,11 @@ struct MenuBarView: View {
                 Text("No active focus session")
                     .font(.callout)
                     .foregroundStyle(.secondary)
+                if let lastLabel = lastSessionLabel {
+                    Text(lastLabel)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             .padding(.top, 16)
 
@@ -76,6 +85,26 @@ struct MenuBarView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
         }
+    }
+
+    /// "Last session · 75% · 2h ago" — or auto-ended note when the prior session was
+    /// closed by the inactivity safety net. nil when no prior session exists.
+    private var lastSessionLabel: String? {
+        guard let session = appState.lastEndedSession,
+              let endedAt = session.endedAt else { return nil }
+        let elapsed = Date.now.timeIntervalSince(endedAt)
+        let hours = Int(elapsed) / 3600
+        let minutes = (Int(elapsed) % 3600) / 60
+        let ago: String
+        if hours > 0 { ago = "\(hours)h ago" }
+        else if minutes > 0 { ago = "\(minutes)m ago" }
+        else { ago = "just now" }
+        if session.endReason == .autoEndedDueToInactivity {
+            return "Auto-ended \(ago) — no reminders confirmed"
+        }
+        guard let stats = session.stats, stats.totalReminders > 0 else { return nil }
+        let percent = Int(stats.overallComplianceRate * 100)
+        return "Last session · \(percent)% · \(ago)"
     }
 
     // MARK: - Active session state
@@ -118,7 +147,7 @@ struct MenuBarView: View {
 
     private var complianceSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Today")
+            Text("This session")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 16)
@@ -128,7 +157,7 @@ struct MenuBarView: View {
                 ForEach(ReminderType.allCases, id: \.self) { type in
                     ReminderTypeCard(
                         type: type,
-                        stats: appState.todayStats.stats(for: type)
+                        stats: appState.currentSessionStats?.stats(for: type) ?? .zero
                     )
                 }
             }

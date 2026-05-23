@@ -4,7 +4,7 @@ public struct DailyStats: Sendable {
     public let date: Date
     public let byType: [ReminderType: TypeStats]
 
-    public struct TypeStats: Sendable {
+    public struct TypeStats: Codable, Sendable {
         public let total: Int
         public let completed: Int
         public let skipped: Int
